@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Buscar Países</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1>Buscar Países</h1>
+      <form id="searchForm" class="mt-3">
+        <div class="form-group">
+          <label for="countryName">Nombre del País:</label>
+          <input
+            type="text"
+            class="form-control"
+            id="countryName"
+            placeholder="Ingrese el nombre del país"
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Buscar</button>
+      </form>
+      <div id="resultContainer" class="mt-5" style="display: none">
+        <h3>Información del País</h3>
+        <ul>
+          <li>
+            <strong>Nombre Oficial:</strong>
+            <span id="countryNameResult"></span>
+          </li>
+          <li><strong>Región:</strong> <span id="regionResult"></span></li>
+          <li>
+            <strong>Subregión:</strong> <span id="subregionResult"></span>
+          </li>
+          <li><strong>Idiomas:</strong> <span id="languagesResult"></span></li>
+          <li><strong>Monedas:</strong> <span id="currenciesResult"></span></li>
+          <li>
+            <strong>Escudo de Armas:</strong> <img id="coatOfArmsResult" />
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        $("#searchForm").submit(function (event) {
+          event.preventDefault();
+          var countryName = $("#countryName").val();
+          searchCountry(countryName);
+        });
+
+        function searchCountry(countryName) {
+          $.ajax({
+            url: "/pais?nombre=" + countryName,
+            type: "GET",
+            success: function (response) {
+              showResult(response);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              $("#resultContainer").hide();
+              var errorMessage = jqXHR.status + ": " + errorThrown;
+              alert("Error: " + errorMessage);
+            },
+          });
+        }
+
+        function showResult(country) {
+          $("#countryNameResult").text(country["name.official"]);
+          $("#regionResult").text(country.region);
+          $("#subregionResult").text(country.subregion);
+          $("#languagesResult").text(country.languages);
+          $("#currenciesResult").text(country.currencies);
+
+          if (country.coatOfArms) {
+            $("#coatOfArmsResult").attr("src", country.coatOfArms);
+            $("#coatOfArmsResult").show();
+          } else {
+            $("#coatOfArmsResult").hide();
+          }
+
+          $("#resultContainer").show();
+        }
+      });
+    </script>
+  </body>
+</html>
